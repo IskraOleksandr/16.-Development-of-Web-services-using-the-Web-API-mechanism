@@ -4,6 +4,8 @@ using Web_API._Web_приложение__Музыкальный_портал_.Mo
 
 namespace Web_API._Web_приложение__Музыкальный_портал_.Controllers
 {
+    [ApiController]
+    [Route("api/MusicStyles")]
     public class MusicStyleController : Controller
     {
         private readonly Music_Portal_APIContext _context;
@@ -13,39 +15,52 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MusicStyle>>> GetMusicStyles()
         {
-            IEnumerable<MusicStyle> styles = await Task.Run(() => _context.MusicStyles.ToListAsync());
-            ViewBag.MusicStyles = styles;
-            return View();
-
+            return await _context.MusicStyles.ToListAsync();
         }
 
-        public IActionResult Create()
+        // POST: api/Students
+        [HttpPost]//add
+        public async Task<ActionResult<Singer>> PostMusicStyle(MusicStyle style)
         {
-            return View();
-        }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,StyleName")] MusicStyle style)
-        {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(style);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return BadRequest(ModelState);
             }
-            return View(style);
+
+            _context.MusicStyles.Add(style);
+            await _context.SaveChangesAsync();
+
+            return Ok(style);
         }
 
-
-        public async Task<IActionResult> Edit(int? id)
+        // PUT: api/Students
+        [HttpPut]
+        public async Task<ActionResult<Singer>> PutMusicStyle(MusicStyle style)
         {
-            if (id == null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_context.MusicStyles.Any(e => e.Id == style.Id))
             {
                 return NotFound();
+            }
+
+            _context.Update(style);
+            await _context.SaveChangesAsync();
+            return Ok(style);
+        }
+
+        // DELETE: api/Students/3
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Singer>> DeleteMusicStyle(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             var style = await _context.MusicStyles.SingleOrDefaultAsync(m => m.Id == id);
@@ -53,74 +68,11 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             {
                 return NotFound();
             }
-            return View(style);
-        }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,StyleName")] MusicStyle style)
-        {
-            if (id != style.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(style);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MusicStyleExists(style.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Index");
-            }
-            return View(style);
-        }
-
-
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var style = await _context.MusicStyles
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (style == null)
-            {
-                return NotFound();
-            }
-
-            return View(style);
-        }
-
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var style = await _context.MusicStyles.SingleOrDefaultAsync(m => m.Id == id);
             _context.MusicStyles.Remove(style);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
 
-        private bool MusicStyleExists(int id)
-        {
-            return _context.MusicStyles.Any(e => e.Id == id);
+            return Ok(style);
         }
     }
 }
