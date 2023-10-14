@@ -23,7 +23,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
 
         // POST: api/Students
         [HttpPost]//add
-        public async Task<ActionResult<Singer>> PostMusicStyle(MusicStyle style)
+        public async Task<ActionResult<MusicStyle>> PostMusicStyle(MusicStyle style)
         {
             if (!ModelState.IsValid)
             {
@@ -38,7 +38,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
 
         // PUT: api/Students
         [HttpPut]
-        public async Task<ActionResult<Singer>> PutMusicStyle(MusicStyle style)
+        public async Task<ActionResult<MusicStyle>> PutMusicStyle(MusicStyle style)
         {
             if (!ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
 
         // DELETE: api/Students/3
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Singer>> DeleteMusicStyle(int id)
+        public async Task<ActionResult<MusicStyle>> DeleteMusicStyle(int id)
         {
             if (!ModelState.IsValid)
             {

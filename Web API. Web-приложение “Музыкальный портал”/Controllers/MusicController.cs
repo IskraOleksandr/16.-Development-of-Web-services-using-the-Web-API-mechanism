@@ -6,6 +6,8 @@ using Web_API._Web_приложение__Музыкальный_портал_.Mo
 
 namespace Web_API._Web_приложение__Музыкальный_портал_.Controllers
 {
+    [ApiController]
+    [Route("api/Musics")]
     public class MusicController : Controller
     {
         private readonly Music_Portal_APIContext _context;
@@ -18,189 +20,64 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             _appEnvironment = appEnvironment;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Music>>> GetMusic()
         {
-            IEnumerable<Music> singers = await Task.Run(() => _context.Musics.Include(u => u.User).Include(u => u.MusicStyle).Include(u => u.Singer));
-            ViewBag.Musics = singers;
-            return View("Index");
+            return await _context.Musics.ToListAsync();
         }
 
-        public ActionResult Logout()
+        // POST: api/Students
+        [HttpPost]//add
+        public async Task<ActionResult<Music>> PostMusic(Music music)
         {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Music");
-        }
-
-
-        public IActionResult Create()
-        {
-            var styles = _context.MusicStyles.ToList();
-            var singers = _context.Singers.ToList();
-
-            ViewBag.Style_List = new SelectList(styles, "Id", "StyleName");
-            ViewBag.Singer_List = new SelectList(singers, "Id", "SingerName");
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Video_Name,Album,Year,Video_URL,VideoDate,MusicStyleId,SingerId,UserId")] Music music, IFormFile Video_URL)
-        {
-            var user_login = HttpContext.Session.GetString("Login");
-
-            if (HttpContext.Session.GetString("Login") == null)
-                return RedirectToAction("Login", "User");
-
-
-            var us = await _context.Users.SingleOrDefaultAsync(u => u.Login == user_login);
-            music.User = us;
-
-            var style = await _context.MusicStyles.SingleOrDefaultAsync(u => u.Id == music.MusicStyleId);
-            music.MusicStyle = style;
-
-            var singer = await _context.Singers.SingleOrDefaultAsync(u => u.Id == music.SingerId);
-            music.Singer = singer;
-
-            music.UserId = us.Id;
-            music.VideoDate = DateTime.Now;
-            try
+            if (!ModelState.IsValid)
             {
-                if (Video_URL != null)
-                {
-                    string file_path = "/Music/" + Video_URL.FileName;
-
-                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + file_path, FileMode.Create))
-                    {
-                        await Video_URL.CopyToAsync(fileStream); // копируем файл в поток
-                    }
-                    music.Video_URL = "~" + file_path;
-                }
-
-
-                _context.Add(music);
-                await _context.SaveChangesAsync();
+                return BadRequest(ModelState);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MusicExists(music.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction("Index");
+
+            _context.Musics.Add(music);
+            await _context.SaveChangesAsync();
+
+            return Ok(music);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        // PUT: api/Students
+        [HttpPut]
+        public async Task<ActionResult<Music>> PutMusic(Music music)
         {
-            if (id == null || _context.Musics == null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_context.Musics.Any(e => e.Id == music.Id))
             {
                 return NotFound();
             }
 
-            var music = await _context.Musics.FindAsync(id);
-            if (music == null)
-            {
-                return NotFound();
-            }
-
-            var styles = _context.MusicStyles.ToList();
-            var singers = _context.Singers.ToList();
-
-            ViewBag.Style_List = new SelectList(styles, "Id", "StyleName");
-            ViewBag.Singer_List = new SelectList(singers, "Id", "SingerName");
-            return View(music);
+            _context.Update(music);
+            await _context.SaveChangesAsync();
+            return Ok(music);
         }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Video_Name,Album,Year,Video_URL,VideoDate,MusicStyleId,SingerId,UserId")] Music music, IFormFile Video_URL)
+        // DELETE: api/Students/3
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Music>> DeleteMusic(int id)
         {
-            if (id != music.Id)
-                return NotFound();
-
-            try
+            if (!ModelState.IsValid)
             {
-                if (HttpContext.Session.GetString("Login") == null)
-                    return RedirectToAction("Login", "User");
-
-                var user_login = HttpContext.Session.GetString("Login");
-
-                var style = await _context.MusicStyles.SingleOrDefaultAsync(u => u.Id == music.MusicStyleId);
-                var singer = await _context.Singers.SingleOrDefaultAsync(u => u.Id == music.SingerId);
-                var us = await _context.Users.SingleOrDefaultAsync(u => u.Login == user_login);
-
-                music.MusicStyle = style;
-                music.Singer = singer;
-                music.User = us;
-
-                music.UserId = us.Id;
-                music.VideoDate = DateTime.Now;
-
-                if (Video_URL != null)
-                {
-                    string file_path = "/Music/" + Video_URL.FileName;
-
-                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + file_path, FileMode.Create))
-                    {
-                        await Video_URL.CopyToAsync(fileStream); // копируем файл в поток
-                    }
-                    music.Video_URL = "~" + file_path;
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Выберите файл для изменения песни!");
-                    return View();//
-                }
-
-                _context.Update(music);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MusicExists(music.Id))
-                {
-                    return NotFound();
-                }
-                else throw;
-            }
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                return BadRequest(ModelState);
             }
 
-            var music = await _context.Musics
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (music == null)
-            {
-                return NotFound();
-            }
-
-            return View(music);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
             var music = await _context.Musics.SingleOrDefaultAsync(m => m.Id == id);
+            if (music == null)
+            {
+                return NotFound();
+            }
+
             _context.Musics.Remove(music);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
 
-        private bool MusicExists(int id)
-        {
-            return (_context.Musics?.Any(e => e.Id == id)).GetValueOrDefault();
+            return Ok(music);
         }
     }
 }
