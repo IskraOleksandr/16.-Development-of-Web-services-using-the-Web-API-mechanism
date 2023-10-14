@@ -4,6 +4,8 @@ using Web_API._Web_приложение__Музыкальный_портал_.Mo
 
 namespace Web_API._Web_приложение__Музыкальный_портал_.Controllers
 {
+    [ApiController]
+    [Route("api/Singers")]
     public class SingerController : Controller
     {
         private readonly Music_Portal_APIContext _context;
@@ -13,39 +15,52 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Singer>>> GetSingers()
         {
-            IEnumerable<Singer> singers = await Task.Run(() => _context.Singers.ToListAsync());
-            ViewBag.Singers = singers;
-            return View();
+            return await _context.Singers.ToListAsync();
         }
 
-
-        public IActionResult Create()
+        // POST: api/Students
+        [HttpPost]//add
+        public async Task<ActionResult<Singer>> PostSinger(Singer singer)
         {
-            return View();
-        }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SingerName")] Singer singer)
-        {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(singer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return BadRequest(ModelState);
             }
-            return View(singer);
+
+            _context.Singers.Add(singer);
+            await _context.SaveChangesAsync();
+
+            return Ok(singer);
         }
 
-
-        public async Task<IActionResult> Edit(int? id)
+        // PUT: api/Students
+        [HttpPut]
+        public async Task<ActionResult<Singer>> PutSinger(Singer singer)
         {
-            if (id == null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_context.Singers.Any(e => e.Id == singer.Id))
             {
                 return NotFound();
+            }
+
+            _context.Update(singer);
+            await _context.SaveChangesAsync();
+            return Ok(singer);
+        }
+
+        // DELETE: api/Students/3
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Singer>> DeleteUser(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             var singer = await _context.Singers.SingleOrDefaultAsync(m => m.Id == id);
@@ -53,74 +68,11 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             {
                 return NotFound();
             }
-            return View(singer);
-        }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SingerName")] Singer singer)
-        {
-            if (id != singer.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(singer);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SingerExists(singer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Index");
-            }
-            return View(singer);
-        }
-
-
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var singer = await _context.Singers
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (singer == null)
-            {
-                return NotFound();
-            }
-
-            return View(singer);
-        }
-
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var singer = await _context.Singers.SingleOrDefaultAsync(m => m.Id == id);
             _context.Singers.Remove(singer);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
 
-        private bool SingerExists(int id)
-        {
-            return _context.Singers.Any(e => e.Id == id);
+            return Ok(singer);
         }
     }
 }
