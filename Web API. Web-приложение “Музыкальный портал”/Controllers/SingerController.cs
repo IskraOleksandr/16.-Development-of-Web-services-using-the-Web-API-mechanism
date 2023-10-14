@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Музыкальный_портал__Music_portal_.Models;
+using Web_API._Web_приложение__Музыкальный_портал_.Models;
 
-namespace Музыкальный_портал__Music_portal_.Controllers
+namespace Web_API._Web_приложение__Музыкальный_портал_.Controllers
 {
     public class SingerController : Controller
     {
-        private readonly Music_PortalContext _context;
+        private readonly Music_Portal_APIContext _context;
 
-        public SingerController(Music_PortalContext context)
+        public SingerController(Music_Portal_APIContext context)
         {
             _context = context;
         }

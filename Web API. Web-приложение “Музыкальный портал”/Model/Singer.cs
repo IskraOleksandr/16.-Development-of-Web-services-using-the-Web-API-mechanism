@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Музыкальный_портал__Music_portal_.Models
+namespace Web_API._Web_приложение__Музыкальный_портал_.Models
 {
     public class Singer
     {

@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Музыкальный_портал__Music_portal_.Models
+namespace Web_API._Web_приложение__Музыкальный_портал_.Models
 {
-    public class Music_PortalContext : DbContext
+    public class Music_Portal_APIContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Music> Musics { get; set; }
         public DbSet<MusicStyle> MusicStyles { get; set; }
         public DbSet<Singer> Singers { get; set; }
 
-        public Music_PortalContext(DbContextOptions<Music_PortalContext> options)
+        public Music_Portal_APIContext(DbContextOptions<Music_Portal_APIContext> options)
             : base(options)
         {
             
