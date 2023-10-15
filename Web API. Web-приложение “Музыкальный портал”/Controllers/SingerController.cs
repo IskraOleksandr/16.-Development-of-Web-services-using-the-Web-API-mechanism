@@ -21,8 +21,8 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             return await _context.Singers.ToListAsync();
         }
 
-        // POST: api/Students
-        [HttpPost]//add
+        // POST: api/Singers
+        [HttpPost]//для добавления нужно удалить строку Id
         public async Task<ActionResult<Singer>> PostSinger(Singer singer)
         {
             if (!ModelState.IsValid)
@@ -36,7 +36,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             return Ok(singer);
         }
 
-        // PUT: api/Students
+        // PUT: api/Singers
         [HttpPut]
         public async Task<ActionResult<Singer>> PutSinger(Singer singer)
         {
@@ -54,7 +54,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             return Ok(singer);
         }
 
-        // DELETE: api/Students/3
+        // DELETE: api/Singers/3
         [HttpDelete("{id}")]
         public async Task<ActionResult<Singer>> DeleteUser(int id)
         {

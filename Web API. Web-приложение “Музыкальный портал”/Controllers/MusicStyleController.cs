@@ -21,8 +21,8 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             return await _context.MusicStyles.ToListAsync();
         }
 
-        // POST: api/Students
-        [HttpPost]//add
+        // POST: api/MusicStyles
+        [HttpPost]//для добавления нужно удалить строку Id
         public async Task<ActionResult<MusicStyle>> PostMusicStyle(MusicStyle style)
         {
             if (!ModelState.IsValid)
@@ -36,7 +36,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             return Ok(style);
         }
 
-        // PUT: api/Students
+        // PUT: api/MusicStyles
         [HttpPut]
         public async Task<ActionResult<MusicStyle>> PutMusicStyle(MusicStyle style)
         {
@@ -54,7 +54,7 @@ namespace Web_API._Web_приложение__Музыкальный_портал
             return Ok(style);
         }
 
-        // DELETE: api/Students/3
+        // DELETE: api/MusicStyles/3
         [HttpDelete("{id}")]
         public async Task<ActionResult<MusicStyle>> DeleteMusicStyle(int id)
         {

@@ -22,9 +22,9 @@ namespace Музыкальный_портал__Music_portal_.Controllers
         {
             return await _context.Users.ToListAsync();
         }
-         
-        // POST: api/Students
-        [HttpPost]//add
+
+        // POST: api/Users
+        [HttpPost]//для добавления нужно удалить строку Id
         public async Task<ActionResult<User>> PostUser(User user)
         {
             if (!ModelState.IsValid)
@@ -38,7 +38,7 @@ namespace Музыкальный_портал__Music_portal_.Controllers
             return Ok(user);
         }
 
-        // PUT: api/Students
+        // PUT: api/Users
         [HttpPut]
         public async Task<ActionResult<User>> PutUser(User user)
         {
@@ -56,7 +56,7 @@ namespace Музыкальный_портал__Music_portal_.Controllers
             return Ok(user);
         }
 
-        // DELETE: api/Students/3
+        // DELETE: api/Users/3
         [HttpDelete("{id}")]
         public async Task<ActionResult<User>> DeleteUser(int id)
         {
